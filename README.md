@@ -4,78 +4,93 @@
 To write a program to predict the price of the house and number of occupants in the house with SGD regressor.
 
 ## Equipments Required:
-1. Hardware – PCs
+1. Hardware – PC
 2. Anaconda – Python 3.7 Installation / Jupyter notebook
 
-## Algorithm:
-Step-1.Start
-Step-2.Data Preparation
-3.Hypothesis Definition
-4.Cost Function
+## Algorithm
+1. Start
+2. Data preparation
+3. Hypothesis Definition
+4. Cost Function
 5.Parameter Update Rule
 6.Iterative Training
-7.Model Evaluation
-8.End 
+7.Model evaluation
+8.End
 
 ## Program:
-```py
-/*
-Program to implement the multivariate linear regression model for predicting the price of the house and number of occupants in the house with SGD regressor.
-Developed by: PRIYADHARSHINI S.S
-RegisterNumber:  2122230140156
-*/
-import pandas as pd
-data=pd.read_csv("C:/Users/Admin/Desktop/Placement_Data.csv")
-data.head()
-data1=data.copy()
-data1=data1.drop(["sl_no","salary"],axis=1)
-data1.head()
-data1.isnull()
-data1.duplicated().sum()
-from sklearn.preprocessing import LabelEncoder
-le=LabelEncoder()
-data1["gender"]=le.fit_transform(data1["gender"])
-data1["ssc_b"]=le.fit_transform(data1["ssc_b"])   
-data1["hsc_b"]=le.fit_transform(data1["hsc_b"])
-data1["hsc_s"]=le.fit_transform(data1["hsc_s"])
-data1["degree_t"]=le.fit_transform(data1["degree_t"])
-data1["workex"]=le.fit_transform(data1["workex"])
-data1["specialisation"]=le.fit_transform(data1["specialisation"])
-data1["status"]=le.fit_transform(data1["status"])
-data1
-x=data1.iloc[:,:-1]
-x
-y=data1["status"]
-y
-from sklearn.model_selection import train_test_split
-x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=0)
-from sklearn.linear_model import LogisticRegression
-lr=LogisticRegression(solver="liblinear")
-lr.fit(x_train,y_train)
-y_pred=lr.predict(x_test)
-y_pred
-from sklearn.metrics import accuracy_score
-accuracy=accuracy_score(y_test,y_pred)
-accuracy
-from sklearn.metrics import classification_report
-classification_report1=classification_report(y_test,y_pred)
-print(classification_report1)
-lr.predict([[1,80,1,90,1,1,90,1,0,85,1,85]])
 ```
 
+*/
+Program to implement the multivariate linear regression model for predicting the price of the house and number of occupants in the house with SGD regressor.
+Developed by: PRIYADHARSHINI S.S
+RegisterNumber: 2122230140156
+*/
+
+import numpy as np
+from sklearn.datasets import fetch_california_housing
+from sklearn.linear_model import SGDRegressor
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
+
+
+data = fetch_california_housing()
+
+
+x= data.data[:,:3]
+
+
+y=np.column_stack((data.target,data.data[:,6]))
+
+x_train, x_test, y_train,y_test = train_test_split(x,y, test_size = 0.2, random_state =42)
+
+scaler_x = StandardScaler()
+scaler_y = StandardScaler()
+
+x_train = scaler_x.fit_transform(x_train)
+x_test = scaler_x.fit_transform(x_test)
+y_train = scaler_y.fit_transform(y_train)
+y_test = scaler_y.fit_transform(y_test)
+
+sgd = SGDRegressor(max_iter=1000, tol = 1e-3)
+
+multi_output_sgd= MultiOutputRegressor(sgd)
+
+multi_output_sgd.fit(x_train, y_train)
+
+y_pred =multi_output_sgd.predict(x_test)
+
+y_pred = scaler_y.inverse_transform(y_pred)
+y_test = scaler_y.inverse_transform(y_test)
+print(y_pred)
+[[ 1.04860312 35.69231257]
+ [ 1.49909521 35.72530255]
+ [ 2.35760015 35.50646978]
+ ...
+ [ 4.47157887 35.06594388]
+ [ 1.70991815 35.75406191]
+ [ 1.79884624 35.34680017]]
+
+mse = mean_squared_error(y_test,y_pred)
+
+print("Mean Squared Error:",mse)
+
+Mean Squared Error: 2.560165984862198
+
+print("\nPredictions:\n",y_pred[:5])
+Predictions:
+ [[ 1.04860312 35.69231257]
+ [ 1.49909521 35.72530255]
+ [ 2.35760015 35.50646978]
+ [ 2.73967825 35.37568192]
+ [ 2.10914107 35.63894336]]
+```
 ## Output:
-```
-y_pred
-```
-![4-1](https://github.com/user-attachments/assets/b9077ea6-8687-4cd6-b394-e3bdd6e8ee9f)
-```
-print(classification_report1)
-```
-![4-2](https://github.com/user-attachments/assets/60ff1356-4819-4f0b-8b98-c35b171f9def)
-```
-lr.predict([[1,80,1,90,1,1,90,1,0,85,1,85]])
-```
-![4-3](https://github.com/user-attachments/assets/c8b3c093-c11f-4bd5-ba1e-0c3001fc12f0)
+
+Mean:
+
+![image](https://github.com/user-attachments/assets/1e6c626f-8096-49d4-93b8-97ca749326d3)
 
 
 ## Result:
